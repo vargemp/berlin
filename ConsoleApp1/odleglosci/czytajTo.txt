@@ -1,0 +1,13 @@
+Wywołanie:
+./oblicz.py [plik z macierzą odległości] [plik z wynikami]
+
+Przykładowo (dla załączonych plików):
+./oblicz.py a280.txt a280_wynik.txt 
+
+lub
+./oblicz.py berlin52.txt berlin52_wynik.txt 
+
+Plik z wyników powinien mieć zapisane kolejne numery miast oddzielone myślnikiem (tylko), a na końcu po spacji wyliczona odległość, czyli:
+miasto1-miasto2-miasto3... odległość
+
+W wyniku wyświetlona zostanie proponowana odległość, obliczona odległość i informacja o tym, czy są sobie równe. Te same informacje zostaną zapisane do pliku z prefiksem "spr_"

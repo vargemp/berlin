@@ -11,35 +11,28 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(getDistance(2,1));
+            Deliverer[] DelivererRoutes = FindRandomRoutes(20);
+            List<int> RouteCosts = new List<int>();
+
+            foreach (var item in DelivererRoutes)
+            {
+                Console.WriteLine("Ocena: " + item.GetRouteCost());
+                RouteCosts.Add(item.GetRouteCost());
+            }
+            Console.Write(RouteCosts.Average());
 
             Console.ReadKey();
         }
-
-        private static string getDistance(int cityA, int cityB)
+        
+        private static Deliverer[] FindRandomRoutes(int DeliverersNumber)
         {
-            string[][] arr = getDistanceArray();
-
-
-            return arr[cityA][cityB];
-        }
-
-        private static string[][] getDistanceArray()
-        {
-            string fileName = "D:/berlin52.txt";
-
-            var lines = File.ReadAllLines(fileName);
-            string[][] array = new string[lines.Length][];
-            string[][] array2 = new string[lines.Length][];
-            for (var i = 1; i < lines.Length; i += 1)
+            Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];
+            for (int i = 0; i < DeliverersNumber; i++)
             {
-                var line = lines[i];
-                array[i - 1] = line.Split(' ');
-                Array.Resize(ref array[i-1], array[i-1].Length - 1);
+                DelivererRoutes[i] = new Deliverer();
             }
 
-            return array;
+            return DelivererRoutes;
         }
-        
     }
 }
