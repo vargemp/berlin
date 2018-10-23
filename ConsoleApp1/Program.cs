@@ -31,12 +31,30 @@ namespace ConsoleApp1
         private static Deliverer[] FindRandomRoutes(int DeliverersNumber)
         {
             Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];
+            string[][] distanceArray = getDistanceArray();
             for (int i = 0; i < DeliverersNumber; i++)
             {
-                DelivererRoutes[i] = new Deliverer();
+                DelivererRoutes[i] = new Deliverer(distanceArray);
             }
 
             return DelivererRoutes;
+        }
+
+        private static string[][] getDistanceArray()
+        {
+            string fileName = "berlin52.txt";
+
+            var lines = File.ReadAllLines(fileName);
+            string[][] array = new string[lines.Length][];
+            string[][] array2 = new string[lines.Length][];
+            for (var i = 1; i < lines.Length; i += 1)
+            {
+                var line = lines[i];
+                array[i - 1] = line.Split(' ');
+                Array.Resize(ref array[i - 1], array[i - 1].Length - 1);
+            }
+
+            return array;
         }
     }
 }

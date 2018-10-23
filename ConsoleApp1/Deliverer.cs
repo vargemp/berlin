@@ -10,9 +10,11 @@ namespace ConsoleApp1
     class Deliverer
     {
         private List<int> Cities = new List<int>();
+        string[][] DistanceArray = new string[53][];
         private int RouteCost;
-        public Deliverer()
+        public Deliverer(string[][] _distanceArray)
         {
+            DistanceArray = _distanceArray;
             List<int> FoundCities = new List<int>();
             Random rnd = new Random();
 
@@ -58,29 +60,12 @@ namespace ConsoleApp1
             return Cities;
         }
 
-        private static int getDistance(int cityA, int cityB)
+        private int getDistance(int cityA, int cityB)
         {
-            string[][] arr = getDistanceArray();
+            string[][] arr = DistanceArray;
 
 
             return int.Parse(arr[cityA][cityB]);
-        }
-
-        private static string[][] getDistanceArray()
-        {
-            string fileName = "D:/berlin52.txt";
-
-            var lines = File.ReadAllLines(fileName);
-            string[][] array = new string[lines.Length][];
-            string[][] array2 = new string[lines.Length][];
-            for (var i = 1; i < lines.Length; i += 1)
-            {
-                var line = lines[i];
-                array[i - 1] = line.Split(' ');
-                Array.Resize(ref array[i - 1], array[i - 1].Length - 1);
-            }
-
-            return array;
         }
     }
 }
