@@ -53,6 +53,11 @@ namespace ConsoleApp1
             return RouteCost;
         }
 
+        public List<int> GetCityList()
+        {
+            return Cities;
+        }
+
         private static int getDistance(int cityA, int cityB)
         {
             string[][] arr = getDistanceArray();

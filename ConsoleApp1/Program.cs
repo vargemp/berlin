@@ -16,10 +16,14 @@ namespace ConsoleApp1
 
             foreach (var item in DelivererRoutes)
             {
-                Console.WriteLine("Ocena: " + item.GetRouteCost());
+                foreach (var item2 in item.GetCityList())
+                {
+                    Console.Write(item2.ToString() + "-");
+                }
+                Console.WriteLine("Route cost: " + item.GetRouteCost());
                 RouteCosts.Add(item.GetRouteCost());
             }
-            Console.Write(RouteCosts.Average());
+            Console.Write("Average route cost: " + RouteCosts.Average());
 
             Console.ReadKey();
         }
