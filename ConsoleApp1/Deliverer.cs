@@ -11,41 +11,24 @@ namespace ConsoleApp1
     {
         private List<int> Cities = new List<int>();
         private int RouteCost;
-        string[][] DistanceArray;
-        public Deliverer(string[][] distanceArray)
+        public Deliverer()
         {
             List<int> FoundCities = new List<int>();
-            DistanceArray = distanceArray;
             Random rnd = new Random();
-
-            for (int i = 0; i < 51; i++)
+            
+            for (int i = 0; i <= 51; i++)
             {
                 int randomCity = rnd.Next(0, 52);
                 while (Cities.Contains(randomCity))
                 {
                     randomCity = rnd.Next(0, 52);
                 }
-                //.Add(randomCity);
                 Cities.Add(randomCity);
             }
-
-            //TODO
+            
             for (int i = 0; i < Cities.Count - 1; i++)
             {
-                int cityA;
-                int cityB;
-
-                if (Cities[i] < Cities[i + 1])
-                {
-                    cityA = Cities[i + 1];
-                    cityB = Cities[i];
-                }
-                else
-                {
-                    cityA = Cities[i];
-                    cityB = Cities[i + 1];
-                }
-                RouteCost += getDistance(cityA, cityB);
+                RouteCost += getDistance(Cities[i], Cities[i + 1]);
             }
             RouteCost += getDistance(Cities.Count - 1, Cities[0]);
         }
@@ -60,36 +43,39 @@ namespace ConsoleApp1
             return Cities;
         }
 
-        private static int getDistance(int cityA, int cityB)
+        private int getDistance(int cityA, int cityB)
         {
-            string[][] arr = getDistanceArray();
-
-            //if (cityA > cityB)
-            //{
-            //    return int.Parse(arr[cityA][cityB]);
-            //}
-            //else
-            //{
-            //    return int.Parse(arr[cityB][cityA]);
-            //}
-            return int.Parse(arr[cityA][cityB]);//out of range jesli cityA = 50, a cityB=51
+            int[,] arr = getDistanceArray();
+            return arr[cityA,cityB];
         }
 
-        private static string[][] getDistanceArray()
+        private static int[,] getDistanceArray()
         {
-            string fileName = "D:/berlin52.txt";
+            string fileName = "berlin52.txt";
 
             var lines = File.ReadAllLines(fileName);
-            string[][] array = new string[lines.Length][];
-            string[][] array2 = new string[lines.Length][];
+            string[][] array = new string[lines.Length-1][];
+            int[,] array2 = new int[lines.Length-1, lines.Length - 1];
             for (var i = 1; i < lines.Length; i += 1)
             {
-                var line = lines[i];
-                array[i - 1] = line.Split(' ');
-                Array.Resize(ref array[i - 1], array[i - 1].Length - 1);
+                var line = lines[i].Remove(lines[i].Length-1,1);//wycina ostatni element "" z wiersza
+                //array[i - 1] = line.Split(' ');
+                string [] splittedLine = line.Split(' ');
+                for (int j = 0; j < splittedLine.Length; j++)
+                {
+                    array2[i - 1, j] = int.Parse(splittedLine[j]);
+                }
+                
+            }
+            for (int i = 0; i < 52; i++)
+            {
+                for (int j = i + 1; j < 52; j++)
+                {
+                    array2[i, j] = array2[j, i];
+                }
             }
 
-            return array;
+            return array2;
         }
     }
 }

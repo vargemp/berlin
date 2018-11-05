@@ -37,17 +37,17 @@ namespace ConsoleApp1
             Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];
             for (int i = 0; i < DeliverersNumber; i++)
             {
-                DelivererRoutes[i] = new Deliverer(getDistanceArray());
+                DelivererRoutes[i] = new Deliverer();
             }
 
             return DelivererRoutes;
         }
         private static string[][] getDistanceArray()
         {
-            string fileName = "D:/berlin52.txt";
+            string fileName = "berlin52.txt";
 
             var lines = File.ReadAllLines(fileName);
-            string[][] array = new string[lines.Length][];
+            string[][] array = new string[lines.Length - 1][];
             string[][] array2 = new string[lines.Length][];
             for (var i = 1; i < lines.Length; i += 1)
             {
