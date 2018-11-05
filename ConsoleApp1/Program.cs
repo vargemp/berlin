@@ -12,18 +12,22 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             Deliverer[] DelivererRoutes = FindRandomRoutes(20);
-            List<int> RouteCosts = new List<int>();
+            List<int> RouteCosts = DelivererRoutes.Select(r => r.GetRouteCost()).ToList();
+            //List<int> RouteCosts = new List<int>();
 
-            foreach (var item in DelivererRoutes)
-            {
-                foreach (var item2 in item.GetCityList())
+            int[] Routes2 = new int[RouteCosts.Count];
+            int k = 3;
+            Random rnd = new Random();
+            for (int i = 0; i < Routes2.Length; i++)
+            {                
+                int[] RandomKRoutes = new int[k];
+                for (int j = 0; j < k; j++)
                 {
-                    Console.Write(item2.ToString() + "-");
+                    int randomDeliverer = rnd.Next(RouteCosts.Count);
+                    RandomKRoutes[j] = RouteCosts[randomDeliverer];
                 }
-                Console.WriteLine("Route cost: " + item.GetRouteCost());
-                RouteCosts.Add(item.GetRouteCost());
+                Routes2[i] = RandomKRoutes.Min();
             }
-            Console.Write("Average route cost: " + RouteCosts.Average());
 
             Console.ReadKey();
         }
@@ -33,10 +37,26 @@ namespace ConsoleApp1
             Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];
             for (int i = 0; i < DeliverersNumber; i++)
             {
-                DelivererRoutes[i] = new Deliverer();
+                DelivererRoutes[i] = new Deliverer(getDistanceArray());
             }
 
             return DelivererRoutes;
+        }
+        private static string[][] getDistanceArray()
+        {
+            string fileName = "D:/berlin52.txt";
+
+            var lines = File.ReadAllLines(fileName);
+            string[][] array = new string[lines.Length][];
+            string[][] array2 = new string[lines.Length][];
+            for (var i = 1; i < lines.Length; i += 1)
+            {
+                var line = lines[i];
+                array[i - 1] = line.Split(' ');
+                Array.Resize(ref array[i - 1], array[i - 1].Length - 1);
+            }
+
+            return array;
         }
     }
 }

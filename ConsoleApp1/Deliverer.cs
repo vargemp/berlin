@@ -11,9 +11,11 @@ namespace ConsoleApp1
     {
         private List<int> Cities = new List<int>();
         private int RouteCost;
-        public Deliverer()
+        string[][] DistanceArray;
+        public Deliverer(string[][] distanceArray)
         {
             List<int> FoundCities = new List<int>();
+            DistanceArray = distanceArray;
             Random rnd = new Random();
 
             for (int i = 0; i < 51; i++)
@@ -62,8 +64,15 @@ namespace ConsoleApp1
         {
             string[][] arr = getDistanceArray();
 
-
-            return int.Parse(arr[cityA][cityB]);
+            //if (cityA > cityB)
+            //{
+            //    return int.Parse(arr[cityA][cityB]);
+            //}
+            //else
+            //{
+            //    return int.Parse(arr[cityB][cityA]);
+            //}
+            return int.Parse(arr[cityA][cityB]);//out of range jesli cityA = 50, a cityB=51
         }
 
         private static string[][] getDistanceArray()
