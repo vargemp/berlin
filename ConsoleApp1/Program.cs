@@ -15,21 +15,58 @@ namespace ConsoleApp1
             List<int> RouteCosts = DelivererRoutes.Select(r => r.GetRouteCost()).ToList();
             //List<int> RouteCosts = new List<int>();
 
-            int[] Routes2 = new int[RouteCosts.Count];
-            int k = 3;
+            int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
+            int[] RouletteRoutes = RouletteSelection(RouteCosts);
+
+            
+            Console.ReadKey();
+        }
+
+        static int[] RouletteSelection(List<int> RouteCosts)
+        {
+            //Calculate S = the sum of a finesses.
+            int[] sortedList = RouteCosts.OrderBy(e => e).ToArray();
+            List<double> invertedList = new List<double>();
+
+            foreach (var item in sortedList)
+            {
+                invertedList.Add((double)1 / item);
+            }
+            double routeCostsSum = invertedList.Sum();
+
+            //Generate a random number between 0 and S.
+
+            //Starting from the top of the population, keep adding the finesses to the partial sum P, till P<S.
+            double partialSum = 0;
+            
+            int j = 0;
+            while (partialSum < routeCostsSum)
+            {
+                partialSum += invertedList[j++];
+            }
+
+
+
+            //The individual for which P exceeds S is the chosen individual.
+            return sortedList;
+        }
+
+        static int[] TournamentSelection(int k, List<int> RouteCosts)
+        {
+            int[] TournamentRoutes = new int[RouteCosts.Count];
+            
             Random rnd = new Random();
-            for (int i = 0; i < Routes2.Length; i++)
-            {                
+            for (int i = 0; i < TournamentRoutes.Length; i++)
+            {
                 int[] RandomKRoutes = new int[k];
                 for (int j = 0; j < k; j++)
                 {
                     int randomDeliverer = rnd.Next(RouteCosts.Count);
                     RandomKRoutes[j] = RouteCosts[randomDeliverer];
                 }
-                Routes2[i] = RandomKRoutes.Min();
+                TournamentRoutes[i] = RandomKRoutes.Min();
             }
-
-            Console.ReadKey();
+            return TournamentRoutes;
         }
         
         private static Deliverer[] FindRandomRoutes(int DeliverersNumber)
