@@ -9,52 +9,80 @@ namespace ConsoleApp1
 {
     class Program
     {
+        static Random rnd = new Random();
         static void Main(string[] args)
         {
             Deliverer[] DelivererRoutes = FindRandomRoutes(20);
             List<int> RouteCosts = DelivererRoutes.Select(r => r.GetRouteCost()).ToList();
+
             //List<int> RouteCosts = new List<int>();
 
             int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
-            int[] RouletteRoutes = RouletteSelection(RouteCosts);
+            List<Deliverer> RouletteRoutes = RouletteSelection(DelivererRoutes);
 
-            
+
             Console.ReadKey();
         }
 
-        static int[] RouletteSelection(List<int> RouteCosts)
+        static List<Deliverer> RouletteSelection(Deliverer[] DelivererRoutes)
         {
-            //Calculate S = the sum of a finesses.
-            int[] sortedList = RouteCosts.OrderBy(e => e).ToArray();
-            List<double> invertedList = new List<double>();
+            //znajduje najgorszego
+            int LongestRouteCost = DelivererRoutes.Max(d => d.GetRouteCost()) + 1;
+            //int sum = 0;
 
-            foreach (var item in sortedList)
+            List<DelivererRate> List = new List<DelivererRate>();
+
+            for (int i = 0; i < DelivererRoutes.Count(); i++)
             {
-                invertedList.Add((double)1 / item);
+                DelivererRate delivererRate = new DelivererRate(DelivererRoutes[i], LongestRouteCost - DelivererRoutes[i].GetRouteCost());
+                List.Add(delivererRate);
             }
-            double routeCostsSum = invertedList.Sum();
 
-            //Generate a random number between 0 and S.
+            int SumOfInversedCost = List.Sum(s => s.InversedCost);
 
-            //Starting from the top of the population, keep adding the finesses to the partial sum P, till P<S.
-            double partialSum = 0;
+            List<Deliverer> List2 = new List<Deliverer>();
             
-            int j = 0;
-            while (partialSum < routeCostsSum)
+            for (int i = 0; i < List.Count(); i++)
             {
-                partialSum += invertedList[j++];
+                int j = 0;
+                int random = rnd.Next(SumOfInversedCost);
+                int sumRandom = List[j].InversedCost;
+                while (sumRandom < random)
+                {
+                    j++;
+                    sumRandom += List[j].InversedCost;
+                }
+                List2.Add(List[j].Deliverer);                
             }
 
 
+            //List<Deliverer> FoundElements = new List<Deliverer>();
+            ////losuje 
+            //for (int i = 0; i < DelivererRoutes.Length; i++)
+            //{
+            //    int randomNum = rnd.Next(LongestRouteCost);
+            //    int range = 0;
+            //    int j = 0;
+            //    bool found = false;
 
-            //The individual for which P exceeds S is the chosen individual.
-            return sortedList;
+            //    while (!found)
+            //    {
+            //        range += List[j].InversedCost;
+            //        if (randomNum < range)
+            //        {
+            //            FoundElements.Add(List[j].Deliverer);
+            //            found = true;
+            //        }
+            //        j++;
+            //    }
+            //}
+            return List2;
         }
 
         static int[] TournamentSelection(int k, List<int> RouteCosts)
         {
             int[] TournamentRoutes = new int[RouteCosts.Count];
-            
+
             Random rnd = new Random();
             for (int i = 0; i < TournamentRoutes.Length; i++)
             {
@@ -68,7 +96,7 @@ namespace ConsoleApp1
             }
             return TournamentRoutes;
         }
-        
+
         private static Deliverer[] FindRandomRoutes(int DeliverersNumber)
         {
             Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];

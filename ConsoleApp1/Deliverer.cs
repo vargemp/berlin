@@ -77,6 +77,11 @@ namespace ConsoleApp1
 
             return array2;
         }
+
+        public void ChangeRouteCost(int newRouteCost)
+        {
+            this.RouteCost = newRouteCost;
+        }
     }
 }
 
