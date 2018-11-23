@@ -140,7 +140,6 @@ namespace ConsoleApp1
                     int numberToAdd = parent2[j];
                     while (areaBetweenP1.Contains(numberToAdd))
                     {
-                        //indexToAdd = parent1.IndexOf(parent2[indexToAdd]);
                         numberToAdd = parent2.IndexOf(parent1[numberToAdd-1]);
                     }
                     childCities.Add(numberToAdd);
@@ -148,7 +147,17 @@ namespace ConsoleApp1
 
                 //dodajemy do uzupełnionej lewej strony wszystko pomiedzy dwoma punktami
                 childCities.AddRange(areaBetweenP1);
-                
+
+                //uzupelniamy czesc tablicy od drugiego przeciecia do konca
+                for (int j = p2+1; j < parent2.Count; j++)
+                {
+                    int numberToAdd = parent2[j];
+                    while (areaBetweenP1.Contains(numberToAdd))
+                    {
+                        numberToAdd = parent2.IndexOf(parent1[numberToAdd - 1]);
+                    }
+                    childCities.Add(numberToAdd);
+                }
 
                 ChildRoutesList.Add(childCities);
             }
