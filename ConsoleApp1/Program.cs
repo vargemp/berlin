@@ -17,8 +17,9 @@ namespace ConsoleApp1
 
             //List<int> RouteCosts = new List<int>();
 
-            int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
+            //int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
             List<Deliverer> RouletteRoutes = RouletteSelection(DelivererRoutes);
+            PmxCrossover(RouletteRoutes);
 
 
             Console.ReadKey();
@@ -41,7 +42,7 @@ namespace ConsoleApp1
             int SumOfInversedCost = List.Sum(s => s.InversedCost);
 
             List<Deliverer> List2 = new List<Deliverer>();
-            
+
             for (int i = 0; i < List.Count(); i++)
             {
                 int j = 0;
@@ -52,7 +53,7 @@ namespace ConsoleApp1
                     j++;
                     sumRandom += List[j].InversedCost;
                 }
-                List2.Add(List[j].Deliverer);                
+                List2.Add(List[j].Deliverer);
             }
 
 
@@ -95,6 +96,73 @@ namespace ConsoleApp1
                 TournamentRoutes[i] = RandomKRoutes.Min();
             }
             return TournamentRoutes;
+        }
+
+        static List<List<int>> PmxCrossover(List<Deliverer> routes)
+        {
+            int routesLength = routes.Count;
+            List<List<int>> ChildRoutesList = new List<List<int>>();
+            //1 rodzic = i , drugi rodzic = i+1
+            for (int i = 0; i < routesLength - 1; i++)
+            {
+                //List<int> parent1 = routes[i].GetCityList();
+                //List<int> parent2 = routes[i + 1].GetCityList();
+                List<int> parent1 = new List<int>(new int[] { 1,2,3,4,5,6,7,8,9 });
+                List<int> parent2 = new List<int>(new int[] { 9,3,7,8,2,6,5,1,4});
+
+                //int p1 = rnd.Next(parent1.Count);
+                //int p2 = rnd.Next(parent1.Count);
+                int p1 = 3;
+                int p2 = 6;
+
+                if (p1 > p2)
+                {
+                    int p3 = p1;
+                    p1 = p2;
+                    p2 = p3;
+                }
+                //-------wylosowane 2 punkty przeciecia
+
+                List<int> areaBetweenP1 = new List<int>();
+                List<int> areaBetweenP2 = new List<int>();
+                //liczby pomiedzy dwoma punktami przeciecia ->
+                for (int j = p1; j <= p2; j++)
+                {
+                    areaBetweenP1.Add(parent1[j]);
+                    areaBetweenP2.Add(parent2[j]);
+                }
+
+                List<int> childCities = new List<int>();
+
+                //uzupelniamy czesc tablicy od lewej do pierwszego przeciecia
+                for (int j = 0; j < p1; j++)
+                {
+                    int numberToAdd = parent2[j];
+                    while (areaBetweenP1.Contains(numberToAdd))
+                    {
+                        //indexToAdd = parent1.IndexOf(parent2[indexToAdd]);
+                        numberToAdd = parent2.IndexOf(parent1[numberToAdd-1]);
+                    }
+                    childCities.Add(numberToAdd);
+                }
+
+                //dodajemy do uzupełnionej lewej strony wszystko pomiedzy dwoma punktami
+                childCities.AddRange(areaBetweenP1);
+                
+
+                ChildRoutesList.Add(childCities);
+            }
+
+            int ileListMaDuplikaty = 0;
+            foreach (var item in ChildRoutesList)
+            {
+                if (item.Count != item.Distinct().Count())
+                {
+                    ileListMaDuplikaty++;
+                }
+            }
+
+            return ChildRoutesList;
         }
 
         private static Deliverer[] FindRandomRoutes(int DeliverersNumber)
