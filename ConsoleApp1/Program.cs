@@ -12,15 +12,15 @@ namespace ConsoleApp1
         static Random rnd = new Random();
         static void Main(string[] args)
         {
-            Deliverer[] DelivererRoutes = FindRandomRoutes(20);
+            Deliverer[] DelivererRoutes = FindRandomRoutes(200);
             List<int> RouteCosts = DelivererRoutes.Select(r => r.GetRouteCost()).ToList();
-
+            Console.WriteLine("Srednia na poczatku: " + DelivererRoutes.Average(d => d.GetRouteCost()));
             //List<int> RouteCosts = new List<int>();
 
             //int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
             List<Deliverer> RouletteRoutes = RouletteSelection(DelivererRoutes);
-            PmxCrossover(RouletteRoutes);
-
+            List<Deliverer> PmxCrossoverDeliverers = PmxCrossover(RouletteRoutes);
+            Console.WriteLine("Srednia po krzyzowaniu: " + PmxCrossoverDeliverers.Average(d => d.GetRouteCost()));
 
             Console.ReadKey();
         }
@@ -98,10 +98,11 @@ namespace ConsoleApp1
             return TournamentRoutes;
         }
 
-        static List<List<int>> PmxCrossover(List<Deliverer> routes)
+        static List<Deliverer> PmxCrossover(List<Deliverer> routes)
         {
             int routesLength = routes.Count;
             List<List<int>> ChildRoutesList = new List<List<int>>();
+            List<Deliverer> CrossoverDeliverers = new List<Deliverer>();
             //1 rodzic = i , drugi rodzic = i+1
             for (int i = 0; i < routesLength - 1; i++)
             {
@@ -161,7 +162,8 @@ namespace ConsoleApp1
                     childCities.Add(numberToAdd);
                 }
 
-                ChildRoutesList.Add(childCities);
+                CrossoverDeliverers.Add(new Deliverer(childCities));
+                //ChildRoutesList.Add(childCities);
             }
 
             //na koniec krzyzowanie ostatniego z pierwszym
@@ -209,7 +211,8 @@ namespace ConsoleApp1
                 childCities2.Add(numberToAdd);
             }
 
-            ChildRoutesList.Add(childCities2);
+            CrossoverDeliverers.Add(new Deliverer(childCities2));
+            //ChildRoutesList.Add(childCities2);
 
 
 
@@ -222,9 +225,10 @@ namespace ConsoleApp1
                 }
             }
 
-            return ChildRoutesList;
+            //return ChildRoutesList;
+            return CrossoverDeliverers;
         }
-
+        
         private static Deliverer[] FindRandomRoutes(int DeliverersNumber)
         {
             Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];

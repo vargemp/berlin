@@ -33,6 +33,17 @@ namespace ConsoleApp1
             RouteCost += getDistance(Cities.Count - 1, Cities[0]);
         }
 
+        public Deliverer(List<int> crossoverCities) //konstruktor dla delivererow po krzyzowaniu
+        {
+
+            Cities = crossoverCities;
+            for (int i = 0; i < Cities.Count - 1; i++)
+            {
+                RouteCost += getDistance(Cities[i], Cities[i + 1]);
+            }
+            RouteCost += getDistance(Cities.Count - 1, Cities[0]);
+        }
+
         public int GetRouteCost()
         {
             return RouteCost;
