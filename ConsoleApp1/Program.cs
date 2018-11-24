@@ -105,15 +105,15 @@ namespace ConsoleApp1
             //1 rodzic = i , drugi rodzic = i+1
             for (int i = 0; i < routesLength - 1; i++)
             {
-                //List<int> parent1 = routes[i].GetCityList();
-                //List<int> parent2 = routes[i + 1].GetCityList();
-                List<int> parent1 = new List<int>(new int[] { 1,2,3,4,5,6,7,8,9 });
-                List<int> parent2 = new List<int>(new int[] { 9,3,7,8,2,6,5,1,4});
+                List<int> parent1 = routes[i].GetCityList();
+                List<int> parent2 = routes[i + 1].GetCityList();
+                //List<int> parent1 = new List<int>(new int[] { 1,2,3,4,5,6,7,8,9 });
+                //List<int> parent2 = new List<int>(new int[] { 9,3,7,8,2,6,5,1,4});
 
-                //int p1 = rnd.Next(parent1.Count);
-                //int p2 = rnd.Next(parent1.Count);
-                int p1 = 3;
-                int p2 = 6;
+                int p1 = rnd.Next(parent1.Count);
+                int p2 = rnd.Next(parent1.Count);
+                //int p1 = 3;
+                //int p2 = 6;
 
                 if (p1 > p2)
                 {
@@ -140,7 +140,8 @@ namespace ConsoleApp1
                     int numberToAdd = parent2[j];
                     while (areaBetweenP1.Contains(numberToAdd))
                     {
-                        numberToAdd = parent2.IndexOf(parent1[numberToAdd-1]);
+                        //numberToAdd = parent2.IndexOf(parent1[numberToAdd-1]);
+                        numberToAdd = parent2[parent1.IndexOf(numberToAdd)];
                     }
                     childCities.Add(numberToAdd);
                 }
@@ -154,13 +155,63 @@ namespace ConsoleApp1
                     int numberToAdd = parent2[j];
                     while (areaBetweenP1.Contains(numberToAdd))
                     {
-                        numberToAdd = parent2.IndexOf(parent1[numberToAdd - 1]);
+                        //numberToAdd = parent2.IndexOf(parent1[numberToAdd - 1]);
+                        numberToAdd = parent2[parent1.IndexOf(numberToAdd)];
                     }
                     childCities.Add(numberToAdd);
                 }
 
                 ChildRoutesList.Add(childCities);
             }
+
+            //na koniec krzyzowanie ostatniego z pierwszym
+            List<int> LastParent = routes[routes.Count-1].GetCityList(); //parent1
+            List<int> FirstParent = routes[0].GetCityList(); //parent2
+
+            int pp1 = rnd.Next(LastParent.Count);
+            int pp2 = rnd.Next(FirstParent.Count);
+
+            if (pp1 > pp2)
+            {
+                int pp3 = pp1;
+                pp1 = pp2;
+                pp2 = pp3;
+            }
+            List<int> areaBetweenLastParent = new List<int>();
+            List<int> areaBetweenFirstParent = new List<int>();
+            for (int j = pp1; j <= pp2; j++)
+            {
+                areaBetweenLastParent.Add(LastParent[j]);
+                areaBetweenFirstParent.Add(FirstParent[j]);
+            }
+
+            List<int> childCities2 = new List<int>();
+            
+            for (int j = 0; j < pp1; j++)
+            {
+                int numberToAdd = FirstParent[j];
+                while (areaBetweenLastParent.Contains(numberToAdd))
+                {
+                    numberToAdd = FirstParent[LastParent.IndexOf(numberToAdd)];
+                }
+                childCities2.Add(numberToAdd);
+            }
+            
+            childCities2.AddRange(areaBetweenLastParent);
+            
+            for (int j = pp2 + 1; j < FirstParent.Count; j++)
+            {
+                int numberToAdd = FirstParent[j];
+                while (areaBetweenLastParent.Contains(numberToAdd))
+                {
+                    numberToAdd = FirstParent[LastParent.IndexOf(numberToAdd)];
+                }
+                childCities2.Add(numberToAdd);
+            }
+
+            ChildRoutesList.Add(childCities2);
+
+
 
             int ileListMaDuplikaty = 0;
             foreach (var item in ChildRoutesList)
