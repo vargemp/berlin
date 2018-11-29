@@ -23,24 +23,26 @@ namespace ConsoleApp1
 
             //int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
             //List<Deliverer> RouletteRoutes = RouletteSelection(DelivererRoutes);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
-                Deliverers = RouletteSelection(Deliverers);
-                Console.WriteLine($"Selekcja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
-                Deliverers = PmxCrossover(Deliverers);
-                Console.WriteLine($"Krzyzowanie{i}: {Deliverers.Average(d => d.GetRouteCost())}");
+                RouletteSelection(Deliverers);
+                //Console.WriteLine($"Selekcja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
+                PmxCrossover(Deliverers);
+                //Console.WriteLine($"Krzyzowanie{i}: {Deliverers.Average(d => d.GetRouteCost())}");
                 GeneExchangeMutation(Deliverers);
-                Console.WriteLine($"Mutacja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
+                //Console.WriteLine($"Mutacja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
+                Console.WriteLine($"Przebieg {i}: {Deliverers.Average(d => d.GetRouteCost())}");
             }
+
             sw.Stop();
-            Console.WriteLine("Elapsed={0}", sw.Elapsed.Seconds);
+            Console.WriteLine("Elapsed={0}", sw.Elapsed.TotalSeconds);
             //List<Deliverer> PmxCrossoverDeliverers = PmxCrossover(RouletteRoutes);
             //Console.WriteLine("Srednia po krzyzowaniu: " + PmxCrossoverDeliverers.Average(d => d.GetRouteCost()));
 
             Console.ReadKey();
         }
 
-        static List<Deliverer> RouletteSelection(List<Deliverer> DelivererRoutes)
+        static void RouletteSelection(List<Deliverer> DelivererRoutes)
         {
             //znajduje najgorszego
             int LongestRouteCost = DelivererRoutes.Max(d => d.GetRouteCost()) + 1;
@@ -56,7 +58,7 @@ namespace ConsoleApp1
 
             int SumOfInversedCost = List.Sum(s => s.InversedCost);
 
-            List<Deliverer> List2 = new List<Deliverer>();
+            //List<Deliverer> List2 = new List<Deliverer>();
 
             for (int i = 0; i < List.Count(); i++)
             {
@@ -68,31 +70,12 @@ namespace ConsoleApp1
                     j++;
                     sumRandom += List[j].InversedCost;
                 }
-                List2.Add(List[j].Deliverer);
+                //List2.Add(List[j].Deliverer);
+                DelivererRoutes[i] = List[j].Deliverer;
             }
 
-
-            //List<Deliverer> FoundElements = new List<Deliverer>();
-            ////losuje 
-            //for (int i = 0; i < DelivererRoutes.Length; i++)
-            //{
-            //    int randomNum = rnd.Next(LongestRouteCost);
-            //    int range = 0;
-            //    int j = 0;
-            //    bool found = false;
-
-            //    while (!found)
-            //    {
-            //        range += List[j].InversedCost;
-            //        if (randomNum < range)
-            //        {
-            //            FoundElements.Add(List[j].Deliverer);
-            //            found = true;
-            //        }
-            //        j++;
-            //    }
-            //}
-            return List2;
+            
+           // return List2;
         }
 
         static int[] TournamentSelection(int k, List<int> RouteCosts)
@@ -113,7 +96,7 @@ namespace ConsoleApp1
             return TournamentRoutes;
         }
 
-        static List<Deliverer> PmxCrossover(List<Deliverer> routes)
+        static void PmxCrossover(List<Deliverer> routes)
         {
             int routesLength = routes.Count;
             List<List<int>> ChildRoutesList = new List<List<int>>();
@@ -177,7 +160,8 @@ namespace ConsoleApp1
                     childCities.Add(numberToAdd);
                 }
 
-                CrossoverDeliverers.Add(new Deliverer(childCities));
+                //CrossoverDeliverers.Add(new Deliverer(childCities));
+                routes[i] = new Deliverer(childCities);
                 //ChildRoutesList.Add(childCities);
             }
 
@@ -226,22 +210,23 @@ namespace ConsoleApp1
                 childCities2.Add(numberToAdd);
             }
 
-            CrossoverDeliverers.Add(new Deliverer(childCities2));
+            //CrossoverDeliverers.Add(new Deliverer(childCities2));
+            routes[routes.Count - 1] = new Deliverer(childCities2);
             //ChildRoutesList.Add(childCities2);
 
 
 
-            int ileListMaDuplikaty = 0;
-            foreach (var item in ChildRoutesList)
-            {
-                if (item.Count != item.Distinct().Count())
-                {
-                    ileListMaDuplikaty++;
-                }
-            }
+            //int ileListMaDuplikaty = 0;
+            //foreach (var item in ChildRoutesList)
+            //{
+            //    if (item.Count != item.Distinct().Count())
+            //    {
+            //        ileListMaDuplikaty++;
+            //    }
+            //}
 
             //return ChildRoutesList;
-            return CrossoverDeliverers;
+            //return CrossoverDeliverers;
         }
 
         static void GeneExchangeMutation(List<Deliverer> routes)
