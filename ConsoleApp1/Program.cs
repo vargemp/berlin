@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,20 +13,34 @@ namespace ConsoleApp1
         static Random rnd = new Random();
         static void Main(string[] args)
         {
-            Deliverer[] DelivererRoutes = FindRandomRoutes(200);
-            List<int> RouteCosts = DelivererRoutes.Select(r => r.GetRouteCost()).ToList();
-            Console.WriteLine("Srednia na poczatku: " + DelivererRoutes.Average(d => d.GetRouteCost()));
+            //Deliverer[] DelivererRoutes = FindRandomRoutes(100);
+            //List<int> RouteCosts = DelivererRoutes.Select(r => r.GetRouteCost()).ToList();
+            Stopwatch sw = new Stopwatch();
+            List<Deliverer> Deliverers = FindRandomRoutes(20);
+            Console.WriteLine("Srednia na poczatku: " + Deliverers.Average(d => d.GetRouteCost()));
+            sw.Start();
             //List<int> RouteCosts = new List<int>();
 
             //int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
-            List<Deliverer> RouletteRoutes = RouletteSelection(DelivererRoutes);
-            List<Deliverer> PmxCrossoverDeliverers = PmxCrossover(RouletteRoutes);
-            Console.WriteLine("Srednia po krzyzowaniu: " + PmxCrossoverDeliverers.Average(d => d.GetRouteCost()));
+            //List<Deliverer> RouletteRoutes = RouletteSelection(DelivererRoutes);
+            for (int i = 0; i < 10; i++)
+            {
+                Deliverers = RouletteSelection(Deliverers);
+                Console.WriteLine($"Selekcja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
+                Deliverers = PmxCrossover(Deliverers);
+                Console.WriteLine($"Krzyzowanie{i}: {Deliverers.Average(d => d.GetRouteCost())}");
+                GeneExchangeMutation(Deliverers);
+                Console.WriteLine($"Mutacja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
+            }
+            sw.Stop();
+            Console.WriteLine("Elapsed={0}", sw.Elapsed.Seconds);
+            //List<Deliverer> PmxCrossoverDeliverers = PmxCrossover(RouletteRoutes);
+            //Console.WriteLine("Srednia po krzyzowaniu: " + PmxCrossoverDeliverers.Average(d => d.GetRouteCost()));
 
             Console.ReadKey();
         }
 
-        static List<Deliverer> RouletteSelection(Deliverer[] DelivererRoutes)
+        static List<Deliverer> RouletteSelection(List<Deliverer> DelivererRoutes)
         {
             //znajduje najgorszego
             int LongestRouteCost = DelivererRoutes.Max(d => d.GetRouteCost()) + 1;
@@ -151,7 +166,7 @@ namespace ConsoleApp1
                 childCities.AddRange(areaBetweenP1);
 
                 //uzupelniamy czesc tablicy od drugiego przeciecia do konca
-                for (int j = p2+1; j < parent2.Count; j++)
+                for (int j = p2 + 1; j < parent2.Count; j++)
                 {
                     int numberToAdd = parent2[j];
                     while (areaBetweenP1.Contains(numberToAdd))
@@ -167,7 +182,7 @@ namespace ConsoleApp1
             }
 
             //na koniec krzyzowanie ostatniego z pierwszym
-            List<int> LastParent = routes[routes.Count-1].GetCityList(); //parent1
+            List<int> LastParent = routes[routes.Count - 1].GetCityList(); //parent1
             List<int> FirstParent = routes[0].GetCityList(); //parent2
 
             int pp1 = rnd.Next(LastParent.Count);
@@ -188,7 +203,7 @@ namespace ConsoleApp1
             }
 
             List<int> childCities2 = new List<int>();
-            
+
             for (int j = 0; j < pp1; j++)
             {
                 int numberToAdd = FirstParent[j];
@@ -198,9 +213,9 @@ namespace ConsoleApp1
                 }
                 childCities2.Add(numberToAdd);
             }
-            
+
             childCities2.AddRange(areaBetweenLastParent);
-            
+
             for (int j = pp2 + 1; j < FirstParent.Count; j++)
             {
                 int numberToAdd = FirstParent[j];
@@ -228,16 +243,35 @@ namespace ConsoleApp1
             //return ChildRoutesList;
             return CrossoverDeliverers;
         }
-        
-        private static Deliverer[] FindRandomRoutes(int DeliverersNumber)
+
+        static void GeneExchangeMutation(List<Deliverer> routes)
         {
-            Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];
+            int cityCount = routes[0].GetCityList().Count;
+
+            for (int i = 0; i < routes.Count; i++)
+            {
+                int randomPlace1 = rnd.Next(cityCount-1);
+                int randomPlace2 = rnd.Next(cityCount-1);
+                while (randomPlace2 == randomPlace1)
+                {
+                    randomPlace2 = rnd.Next(cityCount-1);
+                }
+
+                routes[i].MutateCities(randomPlace1, randomPlace2);
+            }
+        }
+
+        private static List<Deliverer> FindRandomRoutes(int DeliverersNumber)
+        {
+            //Deliverer[] DelivererRoutes = new Deliverer[DeliverersNumber];
+            List<Deliverer> deliverers = new List<Deliverer>();
             for (int i = 0; i < DeliverersNumber; i++)
             {
-                DelivererRoutes[i] = new Deliverer();
+                //DelivererRoutes[i] = new Deliverer();
+                deliverers.Add(new Deliverer());
             }
 
-            return DelivererRoutes;
+            return deliverers;
         }
         private static string[][] getDistanceArray()
         {

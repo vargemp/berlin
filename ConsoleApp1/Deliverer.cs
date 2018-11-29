@@ -93,6 +93,13 @@ namespace ConsoleApp1
         {
             this.RouteCost = newRouteCost;
         }
+
+        public void MutateCities(int cityAIndex, int cityBIndex)
+        {
+            int cityA = Cities[cityAIndex];
+            Cities[cityAIndex] = Cities[cityBIndex];
+            Cities[cityBIndex] = cityA;
+        }
     }
 }
 
