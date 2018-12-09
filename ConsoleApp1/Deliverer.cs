@@ -100,6 +100,7 @@ namespace ConsoleApp1
             Cities[cityAIndex] = Cities[cityBIndex];
             Cities[cityBIndex] = cityA;
         }
+        
     }
 }
 

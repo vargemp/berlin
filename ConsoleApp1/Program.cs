@@ -16,26 +16,28 @@ namespace ConsoleApp1
             //Deliverer[] DelivererRoutes = FindRandomRoutes(100);
             //List<int> RouteCosts = DelivererRoutes.Select(r => r.GetRouteCost()).ToList();
             Stopwatch sw = new Stopwatch();
-            List<Deliverer> Deliverers = FindRandomRoutes(20);
-            Console.WriteLine("Srednia na poczatku: " + Deliverers.Average(d => d.GetRouteCost()));
+            List<Deliverer> Deliverers = FindRandomRoutes(1000);
+            Console.WriteLine($"Najlepszy czas na poczatku: {Deliverers.Min(d => d.GetRouteCost())}");
             sw.Start();
             //List<int> RouteCosts = new List<int>();
 
             //int[] TournamentRoutes = TournamentSelection(3, RouteCosts);
             //List<Deliverer> RouletteRoutes = RouletteSelection(DelivererRoutes);
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 500; i++)
             {
                 RouletteSelection(Deliverers);
+                //TournamentSelection(3, Deliverers);
                 //Console.WriteLine($"Selekcja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
-                PmxCrossover(Deliverers);
+                //PmxCrossover(Deliverers);
                 //Console.WriteLine($"Krzyzowanie{i}: {Deliverers.Average(d => d.GetRouteCost())}");
                 GeneExchangeMutation(Deliverers);
                 //Console.WriteLine($"Mutacja{i}: {Deliverers.Average(d => d.GetRouteCost())}");
-                Console.WriteLine($"Przebieg {i}: {Deliverers.Average(d => d.GetRouteCost())}");
+                //Console.WriteLine($"Przebieg {i}: {Deliverers.Average(d => d.GetRouteCost())}");
             }
 
             sw.Stop();
             Console.WriteLine("Elapsed={0}", sw.Elapsed.TotalSeconds);
+            Console.WriteLine($"Najlepszy czas: {Deliverers.Min(d => d.GetRouteCost())}");
             //List<Deliverer> PmxCrossoverDeliverers = PmxCrossover(RouletteRoutes);
             //Console.WriteLine("Srednia po krzyzowaniu: " + PmxCrossoverDeliverers.Average(d => d.GetRouteCost()));
 
@@ -78,162 +80,112 @@ namespace ConsoleApp1
            // return List2;
         }
 
-        static int[] TournamentSelection(int k, List<int> RouteCosts)
+        static void TournamentSelection(int rozmiarTurnieju, List<Deliverer> DelivererRoutes)
         {
-            int[] TournamentRoutes = new int[RouteCosts.Count];
-
+            int liczebnoscPopulacji = DelivererRoutes.Count();
             Random rnd = new Random();
-            for (int i = 0; i < TournamentRoutes.Length; i++)
+            for (int i = 0; i < liczebnoscPopulacji; i++)
             {
-                int[] RandomKRoutes = new int[k];
-                for (int j = 0; j < k; j++)
+                List<int> foundRandomNumbers = new List<int>();
+                int BestRouteOfRandomDeliverer = 100000;
+                for (int k = 0; k < rozmiarTurnieju; k++)
                 {
-                    int randomDeliverer = rnd.Next(RouteCosts.Count);
-                    RandomKRoutes[j] = RouteCosts[randomDeliverer];
+                    int randomNum = rnd.Next(liczebnoscPopulacji);
+                    while (foundRandomNumbers.Contains(randomNum)){
+                        randomNum = rnd.Next(liczebnoscPopulacji);
+                    }
+                    foundRandomNumbers.Add(randomNum);
+
+                    int RandomDelivererRouteCost = DelivererRoutes[randomNum].GetRouteCost();
+                    if ( RandomDelivererRouteCost < BestRouteOfRandomDeliverer)
+                    {
+                        BestRouteOfRandomDeliverer = RandomDelivererRouteCost;
+                    }
                 }
-                TournamentRoutes[i] = RandomKRoutes.Min();
+                DelivererRoutes[i] = DelivererRoutes.Find(d => d.GetRouteCost() == BestRouteOfRandomDeliverer);
+                foundRandomNumbers.Clear();
             }
-            return TournamentRoutes;
         }
 
         static void PmxCrossover(List<Deliverer> routes)
         {
             int routesLength = routes.Count;
-            List<List<int>> ChildRoutesList = new List<List<int>>();
-            List<Deliverer> CrossoverDeliverers = new List<Deliverer>();
-            //1 rodzic = i , drugi rodzic = i+1
-            for (int i = 0; i < routesLength - 1; i++)
+            for (int i = 1; i < routesLength - 1; i++)
             {
-                List<int> parent1 = routes[i].GetCityList();
-                List<int> parent2 = routes[i + 1].GetCityList();
-                //List<int> parent1 = new List<int>(new int[] { 1,2,3,4,5,6,7,8,9 });
-                //List<int> parent2 = new List<int>(new int[] { 9,3,7,8,2,6,5,1,4});
-
-                int p1 = rnd.Next(parent1.Count);
-                int p2 = rnd.Next(parent1.Count);
-                //int p1 = 3;
-                //int p2 = 6;
-
-                if (p1 > p2)
-                {
-                    int p3 = p1;
-                    p1 = p2;
-                    p2 = p3;
-                }
-                //-------wylosowane 2 punkty przeciecia
-
-                List<int> areaBetweenP1 = new List<int>();
-                List<int> areaBetweenP2 = new List<int>();
-                //liczby pomiedzy dwoma punktami przeciecia ->
-                for (int j = p1; j <= p2; j++)
-                {
-                    areaBetweenP1.Add(parent1[j]);
-                    areaBetweenP2.Add(parent2[j]);
-                }
-
-                List<int> childCities = new List<int>();
-
-                //uzupelniamy czesc tablicy od lewej do pierwszego przeciecia
-                for (int j = 0; j < p1; j++)
-                {
-                    int numberToAdd = parent2[j];
-                    while (areaBetweenP1.Contains(numberToAdd))
-                    {
-                        //numberToAdd = parent2.IndexOf(parent1[numberToAdd-1]);
-                        numberToAdd = parent2[parent1.IndexOf(numberToAdd)];
-                    }
-                    childCities.Add(numberToAdd);
-                }
-
-                //dodajemy do uzupełnionej lewej strony wszystko pomiedzy dwoma punktami
-                childCities.AddRange(areaBetweenP1);
-
-                //uzupelniamy czesc tablicy od drugiego przeciecia do konca
-                for (int j = p2 + 1; j < parent2.Count; j++)
-                {
-                    int numberToAdd = parent2[j];
-                    while (areaBetweenP1.Contains(numberToAdd))
-                    {
-                        //numberToAdd = parent2.IndexOf(parent1[numberToAdd - 1]);
-                        numberToAdd = parent2[parent1.IndexOf(numberToAdd)];
-                    }
-                    childCities.Add(numberToAdd);
-                }
-
-                //CrossoverDeliverers.Add(new Deliverer(childCities));
-                routes[i] = new Deliverer(childCities);
-                //ChildRoutesList.Add(childCities);
+                routes[i] = CrossoverParents(routes[i], routes[i + 1]);
             }
 
             //na koniec krzyzowanie ostatniego z pierwszym
-            List<int> LastParent = routes[routes.Count - 1].GetCityList(); //parent1
-            List<int> FirstParent = routes[0].GetCityList(); //parent2
-
-            int pp1 = rnd.Next(LastParent.Count);
-            int pp2 = rnd.Next(FirstParent.Count);
-
-            if (pp1 > pp2)
-            {
-                int pp3 = pp1;
-                pp1 = pp2;
-                pp2 = pp3;
-            }
-            List<int> areaBetweenLastParent = new List<int>();
-            List<int> areaBetweenFirstParent = new List<int>();
-            for (int j = pp1; j <= pp2; j++)
-            {
-                areaBetweenLastParent.Add(LastParent[j]);
-                areaBetweenFirstParent.Add(FirstParent[j]);
-            }
-
-            List<int> childCities2 = new List<int>();
-
-            for (int j = 0; j < pp1; j++)
-            {
-                int numberToAdd = FirstParent[j];
-                while (areaBetweenLastParent.Contains(numberToAdd))
-                {
-                    numberToAdd = FirstParent[LastParent.IndexOf(numberToAdd)];
-                }
-                childCities2.Add(numberToAdd);
-            }
-
-            childCities2.AddRange(areaBetweenLastParent);
-
-            for (int j = pp2 + 1; j < FirstParent.Count; j++)
-            {
-                int numberToAdd = FirstParent[j];
-                while (areaBetweenLastParent.Contains(numberToAdd))
-                {
-                    numberToAdd = FirstParent[LastParent.IndexOf(numberToAdd)];
-                }
-                childCities2.Add(numberToAdd);
-            }
-
-            //CrossoverDeliverers.Add(new Deliverer(childCities2));
-            routes[routes.Count - 1] = new Deliverer(childCities2);
-            //ChildRoutesList.Add(childCities2);
-
-
-
-            //int ileListMaDuplikaty = 0;
-            //foreach (var item in ChildRoutesList)
-            //{
-            //    if (item.Count != item.Distinct().Count())
-            //    {
-            //        ileListMaDuplikaty++;
-            //    }
-            //}
-
-            //return ChildRoutesList;
-            //return CrossoverDeliverers;
+            routes[routes.Count - 1] = CrossoverParents(routes[routes.Count - 1], routes[0]);
         }
+
+        static Deliverer CrossoverParents(Deliverer parent1, Deliverer parent2)
+        {
+            //List<int> parent1Cities = new List<int>(new int[] { 1,2,3,4,5,6,7,8,9 });
+            //Deliverer parent1 = new Deliverer(parent1Cities);
+            //List<int> parent2Cities = new List<int>(new int[] { 9,3,7,8,2,6,5,1,4});
+            //Deliverer parent2 = new Deliverer(parent2Cities);
+
+            int[] childCities = new int[parent1.GetCityList().Count];
+
+            int p1 = rnd.Next(parent1.GetCityList().Count);
+            int p2 = rnd.Next(parent1.GetCityList().Count);
+            //int p1 = 3;
+            //int p2 = 6;
+            while (p2 == p1)
+            {
+                p2 = rnd.Next(parent1.GetCityList().Count);
+            }
+            if (p1 > p2)
+            {
+                int p3 = p1;
+                p1 = p2;
+                p2 = p3;
+            }
+            //-------wylosowane 2 punkty przeciecia
+            
+            //liczby pomiedzy dwoma punktami przeciecia ->
+            for (int j = p1; j <= p2; j++)
+            {
+                childCities[j] = parent1.GetCityList()[j];
+            }
+
+            int[] areaBetween = new int[(p2-p1)+1];
+            Array.Copy(childCities, p1, areaBetween, 0, (p2 - p1)+1);
+            
+
+            //uzupelniamy czesc tablicy od lewej do pierwszego przeciecia
+            for (int j = 0; j < p1; j++)
+            {
+                int numberToAdd = parent2.GetCityList()[j];
+                while (areaBetween.Contains(numberToAdd))
+                {
+                    //numberToAdd = parent2.IndexOf(parent1[numberToAdd-1]);
+                    numberToAdd = parent2.GetCityList()[parent1.GetCityList().IndexOf(numberToAdd)];
+                }
+                childCities[j] = numberToAdd;
+            }
+
+            //uzupelniamy czesc tablicy od drugiego przeciecia do konca
+            for (int j = p2 + 1; j < parent2.GetCityList().Count; j++)
+            {
+                int numberToAdd = parent2.GetCityList()[j];
+                while (areaBetween.Contains(numberToAdd))
+                {
+                    //numberToAdd = parent2.IndexOf(parent1[numberToAdd - 1]);
+                    numberToAdd = parent2.GetCityList()[parent1.GetCityList().IndexOf(numberToAdd)];
+                }
+                childCities[j] = numberToAdd;
+            }
+
+            return (new Deliverer(childCities.ToList()));
+        }
+
 
         static void GeneExchangeMutation(List<Deliverer> routes)
         {
             int cityCount = routes[0].GetCityList().Count;
-
-            for (int i = 0; i < routes.Count; i++)
+            for (int i = 0; i < cityCount; i++)
             {
                 int randomPlace1 = rnd.Next(cityCount-1);
                 int randomPlace2 = rnd.Next(cityCount-1);
